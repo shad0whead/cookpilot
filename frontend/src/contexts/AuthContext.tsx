@@ -5,7 +5,8 @@ import {
   signInWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  sendEmailVerification
 } from 'firebase/auth';
 import { auth } from '../utils/firebase.ts';
 
@@ -16,6 +17,8 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
+  sendVerificationEmail: () => Promise<void>;
+  isEmailVerified: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -32,8 +35,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  function signup(email: string, password: string) {
-    return createUserWithEmailAndPassword(auth, email, password);
+  async function signup(email: string, password: string) {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    // Send verification email immediately after signup
+    if (userCredential.user) {
+      await sendEmailVerification(userCredential.user);
+    }
   }
 
   function login(email: string, password: string) {
@@ -48,10 +55,29 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return sendPasswordResetEmail(auth, email);
   }
 
+  function sendVerificationEmail() {
+    if (currentUser && !currentUser.emailVerified) {
+      return sendEmailVerification(currentUser);
+    }
+    return Promise.reject(new Error("No user is logged in or email is already verified"));
+  }
+
+  function isEmailVerified() {
+    return currentUser?.emailVerified || false;
+  }
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      setLoading(false);
+      // Force refresh to get the latest emailVerified status
+      if (user) {
+        user.reload().then(() => {
+          setCurrentUser(user);
+          setLoading(false);
+        });
+      } else {
+        setCurrentUser(null);
+        setLoading(false);
+      }
     });
 
     return unsubscribe;
@@ -63,7 +89,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signup,
     login,
     logout,
-    resetPassword
+    resetPassword,
+    sendVerificationEmail,
+    isEmailVerified
   };
 
   return (

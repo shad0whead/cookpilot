@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext.tsx';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface LoginProps {
   onToggleForm?: () => void;
@@ -11,7 +11,20 @@ const Login: React.FC<LoginProps> = ({ onToggleForm }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const [verificationNeeded, setVerificationNeeded] = useState(false);
+  const { login, currentUser, sendVerificationEmail, isEmailVerified } = useAuth();
+  const navigate = useNavigate();
+
+  // Check if user is already logged in and verified
+  useEffect(() => {
+    if (currentUser) {
+      if (isEmailVerified()) {
+        navigate('/');
+      } else {
+        setVerificationNeeded(true);
+      }
+    }
+  }, [currentUser, navigate, isEmailVerified]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,8 +33,14 @@ const Login: React.FC<LoginProps> = ({ onToggleForm }) => {
       setError('');
       setLoading(true);
       await login(email, password);
-      // Redirect to home page after successful login
-      window.location.href = '/';
+      
+      // Check if email is verified after login
+      if (currentUser && !isEmailVerified()) {
+        setVerificationNeeded(true);
+      } else {
+        // Redirect to home page after successful login with verified email
+        navigate('/');
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to sign in. Please check your credentials.');
       console.error(err);
@@ -29,6 +48,57 @@ const Login: React.FC<LoginProps> = ({ onToggleForm }) => {
       setLoading(false);
     }
   };
+
+  const handleResendVerification = async () => {
+    try {
+      setError('');
+      setLoading(true);
+      await sendVerificationEmail();
+      setError(''); // Clear any previous errors
+      // Show success message
+      alert('Verification email sent! Please check your inbox and verify your email address before logging in.');
+    } catch (err: any) {
+      setError(err.message || 'Failed to send verification email');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (verificationNeeded) {
+    return (
+      <div className="w-full max-w-md p-6 bg-gray-800 rounded-lg shadow-dark text-gray-100">
+        <h2 className="text-2xl font-bold text-center text-gray-100 mb-6">Email Verification Required</h2>
+        
+        <div className="bg-yellow-900 border border-yellow-700 text-yellow-100 px-4 py-3 rounded mb-4" role="alert">
+          Your email address has not been verified. Please check your inbox for a verification email and click the link to verify your account.
+        </div>
+        
+        <p className="mb-4 text-gray-300">
+          Didn't receive the email? Check your spam folder or click below to resend.
+        </p>
+        
+        <button
+          onClick={handleResendVerification}
+          disabled={loading}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-4"
+        >
+          {loading ? 'Sending...' : 'Resend Verification Email'}
+        </button>
+        
+        <button
+          onClick={() => {
+            setVerificationNeeded(false);
+            setEmail('');
+            setPassword('');
+          }}
+          className="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full mb-4"
+        >
+          Back to Login
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-md p-6 bg-gray-800 rounded-lg shadow-dark text-gray-100">

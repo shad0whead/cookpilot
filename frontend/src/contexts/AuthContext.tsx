@@ -7,7 +7,6 @@ import {
   createUserWithEmailAndPassword,
   signOut,
   User,
-  } from 'firebase/auth';
 import { auth } from '../utils/firebase';
 interface AuthContextType {
   user: User | null;

@@ -1,0 +1,238 @@
+/* Add responsive design styles to ensure mobile compatibility */
+/* Base styles for all screen sizes */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom color scheme */
+:root {
+  --primary-color: #4F7942; /* Sage green */
+  --secondary-color: #F08080; /* Light coral */
+  --accent-color: #FFD700; /* Gold */
+  --background-color: #F5F5F5; /* Off-white */
+  --text-color: #333333; /* Dark gray */
+}
+
+/* Dark theme variables */
+.dark {
+  --primary-color: #4F7942; /* Keep the same green */
+  --secondary-color: #E05D5D; /* Darker coral */
+  --accent-color: #CCAC00; /* Darker gold */
+  --background-color: #1F2937; /* Dark slate gray */
+  --text-color: #E5E7EB; /* Light gray */
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-color);
+  background-color: var(--background-color);
+}
+
+/* Apply dark mode by default */
+body {
+  @apply dark;
+}
+
+/* Mobile-first responsive design */
+.container {
+  width: 100%;
+  padding-right: 1rem;
+  padding-left: 1rem;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/* Small devices (landscape phones, 640px and up) */
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+/* Large devices (desktops, 1024px and up) */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+/* Extra large devices (large desktops, 1280px and up) */
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+/* Mobile navigation styles */
+.mobile-nav {
+  display: block;
+}
+
+.desktop-nav {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .mobile-nav {
+    display: none;
+  }
+  
+  .desktop-nav {
+    display: block;
+  }
+}
+
+/* Form elements responsive styling */
+input, select, textarea {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.25rem;
+}
+
+/* Dark mode form elements */
+.dark input, .dark select, .dark textarea {
+  background-color: #374151;
+  border-color: #4B5563;
+  color: #E5E7EB;
+}
+
+/* Button responsive styling */
+button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  font-weight: 600;
+}
+
+/* Grid layout for recipe cards */
+.recipe-grid {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .recipe-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .recipe-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Responsive table styles */
+.responsive-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* Touch-friendly elements for mobile */
+.touch-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Responsive typography */
+h1 {
+  font-size: 1.5rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+}
+
+h3 {
+  font-size: 1.125rem;
+}
+
+@media (min-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+  }
+}
+
+/* Responsive padding and margins */
+.section {
+  padding: 1rem 0;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: 2rem 0;
+  }
+}
+
+/* Responsive flex layouts */
+.flex-col-mobile {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .flex-col-mobile {
+    flex-direction: row;
+  }
+}
+
+/* Responsive image handling */
+.responsive-img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Utility classes for responsive spacing */
+.my-responsive {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .my-responsive {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+  }
+}
+
+.py-responsive {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+@media (min-width: 768px) {
+  .py-responsive {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+  }
+}
+
+/* Dark mode specific utility classes */
+.dark-card {
+  @apply bg-gray-800 text-gray-100 shadow-dark;
+}
+
+.dark-input {
+  @apply bg-gray-700 border-gray-600 text-gray-100 focus:border-primary-dark focus:ring-primary-dark;
+}
+
+.dark-button {
+  @apply bg-primary hover:bg-primary-dark text-white;
+}

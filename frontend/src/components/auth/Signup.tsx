@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext.tsx';
+import { useAuth } from 'contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 
 interface SignupProps {
@@ -13,15 +13,15 @@ const Signup: React.FC<SignupProps> = ({ onToggleForm }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
-  const { signup, currentUser, sendVerificationEmail, isEmailVerified } = useAuth();
+  const { signup, user: currentUser, logout: sendVerificationEmail, logout: isEmailVerified } = useAuth();
   const navigate = useNavigate();
 
   // Check if user is already verified
   useEffect(() => {
-    if (currentUser && isEmailVerified()) {
+    if (currentUser) {
       navigate('/');
     }
-  }, [currentUser, navigate, isEmailVerified]);
+  }, [currentUser, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

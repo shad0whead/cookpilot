@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from 'contexts/AuthContext';
 
 interface RecipeFormData {
   title: string;
@@ -17,7 +17,7 @@ interface RecipeFormData {
 const RecipeForm: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const navigate = useNavigate();
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -47,7 +47,7 @@ const RecipeForm: React.FC = () => {
         
         const response = await fetch(`https://cookpilot-backend.onrender.com/api/recipes/${id}`, {
           headers: {
-            'Authorization': `Bearer ${await currentUser?.getIdToken()}`
+            'Authorization': `Bearer ${await user?.getIdToken()}`
           }
         });
         
@@ -93,7 +93,7 @@ const RecipeForm: React.FC = () => {
     };
 
     fetchRecipe();
-  }, [id, currentUser]);
+  }, [id, user]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -227,7 +227,7 @@ const RecipeForm: React.FC = () => {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${await currentUser?.getIdToken()}`
+            'Authorization': `Bearer ${await user?.getIdToken()}`
           },
           body: JSON.stringify(apiData),
         });
@@ -237,7 +237,7 @@ const RecipeForm: React.FC = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${await currentUser?.getIdToken()}`
+            'Authorization': `Bearer ${await user?.getIdToken()}`
           },
           body: JSON.stringify(apiData),
         });

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from 'contexts/AuthContext';
 
 interface Recipe {
   id: string;
@@ -19,7 +19,7 @@ interface Recipe {
 
 const RecipeDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -32,7 +32,7 @@ const RecipeDetail: React.FC = () => {
         // Fetch from the backend API
         const response = await fetch(`https://cookpilot-backend.onrender.com/api/recipes/${id}`, {
           headers: {
-            'Authorization': `Bearer ${await currentUser?.getIdToken()}`
+            'Authorization': `Bearer ${await user?.getIdToken()}`
           }
         });
         
@@ -117,7 +117,7 @@ const RecipeDetail: React.FC = () => {
     };
 
     fetchRecipe();
-  }, [id, currentUser]);
+  }, [id, user]);
 
   const handleDelete = async () => {
     if (!window.confirm('Are you sure you want to delete this recipe?')) {
@@ -128,7 +128,7 @@ const RecipeDetail: React.FC = () => {
       const response = await fetch(`https://cookpilot-backend.onrender.com/api/recipes/${id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${await currentUser?.getIdToken()}`
+          'Authorization': `Bearer ${await user?.getIdToken()}`
         }
       });
       

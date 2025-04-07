@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from 'contexts/AuthContext';
 
 interface Ingredient {
   name: string;
@@ -22,7 +22,7 @@ interface Recipe {
 
 const RecipeScaling: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -39,7 +39,7 @@ const RecipeScaling: React.FC = () => {
         // Fetch from the backend API
         const response = await fetch(`https://cookpilot-backend.onrender.com/api/recipes/${id}`, {
           headers: {
-            'Authorization': `Bearer ${await currentUser?.getIdToken()}`
+            'Authorization': `Bearer ${await user?.getIdToken()}`
           }
         });
         
@@ -100,7 +100,7 @@ const RecipeScaling: React.FC = () => {
     };
 
     fetchRecipe();
-  }, [id, currentUser]);
+  }, [id, user]);
 
   // Update scale factor when new servings change
   const handleServingsChange = (value: number) => {

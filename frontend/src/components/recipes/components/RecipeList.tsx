@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from 'contexts/AuthContext';
 
 interface Recipe {
   id: string;
@@ -14,7 +14,7 @@ interface Recipe {
 }
 
 const RecipeList: React.FC = () => {
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +26,7 @@ const RecipeList: React.FC = () => {
         // Fetch from the backend API
         const response = await fetch('https://cookpilot-backend.onrender.com/api/recipes', {
           headers: {
-            'Authorization': `Bearer ${await currentUser?.getIdToken()}`
+            'Authorization': `Bearer ${await user?.getIdToken()}`
           }
         });
         
@@ -94,7 +94,7 @@ const RecipeList: React.FC = () => {
     };
 
     fetchRecipes();
-  }, [currentUser]);
+  }, [user]);
 
   if (loading) {
     return <div className="text-center py-10">Loading recipes...</div>;

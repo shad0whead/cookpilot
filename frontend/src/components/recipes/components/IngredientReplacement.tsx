@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from 'contexts/AuthContext';
 
 interface IngredientSubstitution {
   original: string;
@@ -10,7 +10,7 @@ interface IngredientSubstitution {
 
 const IngredientReplacement: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [selectedIngredient, setSelectedIngredient] = useState<string>('');
   const [substitutions, setSubstitutions] = useState<IngredientSubstitution[]>([]);
@@ -24,7 +24,7 @@ const IngredientReplacement: React.FC = () => {
         // Fetch from the backend API
         const response = await fetch(`https://cookpilot-backend.onrender.com/api/recipes/${id}`, {
           headers: {
-            'Authorization': `Bearer ${await currentUser?.getIdToken()}`
+            'Authorization': `Bearer ${await user?.getIdToken()}`
           }
         });
         
@@ -63,7 +63,7 @@ const IngredientReplacement: React.FC = () => {
     };
 
     fetchRecipe();
-  }, [id, currentUser]);
+  }, [id, user]);
 
   // Get substitutions for selected ingredient
   const getSubstitutions = async () => {

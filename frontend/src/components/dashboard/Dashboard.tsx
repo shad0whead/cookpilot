@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from 'contexts/AuthContext';
 
 interface Recipe {
   id: string;
@@ -53,7 +53,7 @@ const RecipeCard: React.FC<{ recipe: Recipe }> = ({ recipe }) => {
 };
 
 const Dashboard: React.FC = () => {
-  const { currentUser, logout } = useAuth();
+  const { user: currentUser, logout } = useAuth();
   const navigate = useNavigate();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [recentRecipes, setRecentRecipes] = useState<Recipe[]>([]);

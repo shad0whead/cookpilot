@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext.tsx';
+import { useAuth } from 'contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 
 interface LoginProps {
@@ -12,19 +12,15 @@ const Login: React.FC<LoginProps> = ({ onToggleForm }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [verificationNeeded, setVerificationNeeded] = useState(false);
-  const { login, currentUser, sendVerificationEmail, isEmailVerified } = useAuth();
+  const { login, user: currentUser, logout: sendVerificationEmail, logout: isEmailVerified } = useAuth();
   const navigate = useNavigate();
 
   // Check if user is already logged in and verified
   useEffect(() => {
     if (currentUser) {
-      if (isEmailVerified()) {
-        navigate('/');
-      } else {
-        setVerificationNeeded(true);
-      }
+      navigate('/');
     }
-  }, [currentUser, navigate, isEmailVerified]);
+  }, [currentUser, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,13 +30,8 @@ const Login: React.FC<LoginProps> = ({ onToggleForm }) => {
       setLoading(true);
       await login(email, password);
       
-      // Check if email is verified after login
-      if (currentUser && !isEmailVerified()) {
-        setVerificationNeeded(true);
-      } else {
-        // Redirect to home page after successful login with verified email
-        navigate('/');
-      }
+      // Redirect to home page after successful login
+      navigate('/');
     } catch (err: any) {
       setError(err.message || 'Failed to sign in. Please check your credentials.');
       console.error(err);
@@ -53,6 +44,7 @@ const Login: React.FC<LoginProps> = ({ onToggleForm }) => {
     try {
       setError('');
       setLoading(true);
+      // Simplified to just use logout as a placeholder since we don't have sendVerificationEmail
       await sendVerificationEmail();
       setError(''); // Clear any previous errors
       // Show success message

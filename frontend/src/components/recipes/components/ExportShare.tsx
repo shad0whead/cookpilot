@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from 'contexts/AuthContext';
 
 interface ExportOptions {
   includeNutrition: boolean;
@@ -26,7 +26,7 @@ interface Recipe {
 
 const ExportShare: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +49,7 @@ const ExportShare: React.FC = () => {
         // Fetch from the backend API
         const response = await fetch(`https://cookpilot-backend.onrender.com/api/recipes/${id}`, {
           headers: {
-            'Authorization': `Bearer ${await currentUser?.getIdToken()}`
+            'Authorization': `Bearer ${await user?.getIdToken()}`
           }
         });
         
@@ -103,7 +103,7 @@ const ExportShare: React.FC = () => {
     };
 
     fetchRecipe();
-  }, [id, currentUser]);
+  }, [id, user]);
 
   const handleOptionChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target as HTMLInputElement;

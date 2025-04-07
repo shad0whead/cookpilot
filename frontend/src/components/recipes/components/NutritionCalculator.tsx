@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAuth } from '../../../contexts/AuthContext';
+import { useAuth } from 'contexts/AuthContext';
 
 interface NutritionInfo {
   calories: number;
@@ -19,7 +19,7 @@ interface Ingredient {
 
 const NutritionCalculator: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { currentUser } = useAuth();
+  const { user } = useAuth();
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [recipeTitle, setRecipeTitle] = useState<string>('');
   const [servings, setServings] = useState<number>(1);
@@ -35,7 +35,7 @@ const NutritionCalculator: React.FC = () => {
         // Fetch from the backend API
         const response = await fetch(`https://cookpilot-backend.onrender.com/api/recipes/${id}`, {
           headers: {
-            'Authorization': `Bearer ${await currentUser?.getIdToken()}`
+            'Authorization': `Bearer ${await user?.getIdToken()}`
           }
         });
         
@@ -78,7 +78,7 @@ const NutritionCalculator: React.FC = () => {
     };
 
     fetchRecipe();
-  }, [id, currentUser]);
+  }, [id, user]);
 
   // Calculate nutrition information
   const calculateNutrition = async () => {

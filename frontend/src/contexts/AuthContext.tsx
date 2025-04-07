@@ -1,13 +1,14 @@
 // src/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { auth } from '../utils/firebase';
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
   User,
+} from 'firebase/auth';
 import { auth } from '../utils/firebase';
+
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<void>;

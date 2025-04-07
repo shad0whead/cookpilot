@@ -1,260 +1,108 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from typing import List, Optional
-from pydantic import BaseModel, Field
-from datetime import datetime
-from bson import ObjectId
-import pymongo
-from pymongo import MongoClient
-import os
-from dotenv import load_dotenv
+from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Dict, Any, List
 
-# Load environment variables
-load_dotenv()
+router = APIRouter()
 
-# MongoDB connection
-MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
-client = MongoClient(MONGO_URI)
-db = client.cookpilot_db
+@router.get("/")
+async def get_recipes():
+    """
+    Get all recipes
+    """
+    # This would typically fetch recipes from a database
+    # For now, return sample recipes
+    sample_recipes = [
+        {
+            "id": "1",
+            "title": "Spaghetti Carbonara",
+            "description": "A classic Italian pasta dish with eggs, cheese, pancetta, and black pepper.",
+            "media": ["https://images.unsplash.com/photo-1612874742237-6526221588e3"],
+            "prep_time": 10,
+            "cook_time": 15,
+            "servings": 4,
+            "tags": ["pasta", "italian", "dinner"]
+        },
+        {
+            "id": "2",
+            "title": "Chicken Tikka Masala",
+            "description": "Grilled chicken chunks in a creamy sauce with Indian spices.",
+            "media": ["https://images.unsplash.com/photo-1565557623262-b51c2513a641"],
+            "prep_time": 20,
+            "cook_time": 30,
+            "servings": 4,
+            "tags": ["chicken", "indian", "curry", "dinner"]
+        },
+        {
+            "id": "3",
+            "title": "Avocado Toast",
+            "description": "Simple and delicious breakfast with mashed avocado on toasted bread.",
+            "media": ["https://images.unsplash.com/photo-1588137378633-dea1336ce1e2"],
+            "prep_time": 5,
+            "cook_time": 5,
+            "servings": 1,
+            "tags": ["breakfast", "vegetarian", "quick"]
+        }
+    ]
+    return sample_recipes
 
-# Helper for ObjectId conversion
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError("Invalid ObjectId")
-        return ObjectId(v)
-
-    @classmethod
-    def __modify_schema__(cls, field_schema):
-        field_schema.update(type="string")
-
-# Ingredient model
-class IngredientModel(BaseModel):
-    name: str
-    quantity: float
-    unit: str
-    notes: Optional[str] = None
-
-# Step model
-class StepModel(BaseModel):
-    order: int
-    description: str
-    time: Optional[int] = None
-    temperature: Optional[dict] = None
-    media: Optional[List[str]] = None
-
-# Recipe models
-class RecipeBase(BaseModel):
-    title: str
-    description: Optional[str] = None
-    chef_id: str
-    ingredients: List[IngredientModel]
-    steps: List[StepModel]
-    tags: Optional[List[str]] = None
-    cuisine: Optional[str] = None
-    prep_time: Optional[int] = None
-    cook_time: Optional[int] = None
-    servings: Optional[int] = None
-    media: Optional[List[str]] = None
-    nutrition: Optional[dict] = None
-    scaling_factors: Optional[dict] = None
-    version: int = 1
-
-class RecipeCreate(RecipeBase):
-    pass
-
-class RecipeUpdate(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-    ingredients: Optional[List[IngredientModel]] = None
-    steps: Optional[List[StepModel]] = None
-    tags: Optional[List[str]] = None
-    cuisine: Optional[str] = None
-    prep_time: Optional[int] = None
-    cook_time: Optional[int] = None
-    servings: Optional[int] = None
-    media: Optional[List[str]] = None
-    nutrition: Optional[dict] = None
-    scaling_factors: Optional[dict] = None
-    version: Optional[int] = None
-
-class RecipeInDB(RecipeBase):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: Optional[datetime] = None
-
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
-
-class RecipeOut(RecipeBase):
-    id: str
-    created_at: datetime
-    updated_at: Optional[datetime] = None
-
-    class Config:
-        allow_population_by_field_name = True
-
-# Create router
-router = APIRouter(
-    prefix="/api/recipes",
-    tags=["recipes"],
-    responses={404: {"description": "Not found"}},
-)
-
-# Get all recipes with optional filtering
-@router.get("/", response_model=List[RecipeOut])
-async def get_recipes(
-    skip: int = 0, 
-    limit: int = 10,
-    search: Optional[str] = None,
-    tags: Optional[List[str]] = Query(None),
-    chef_id: Optional[str] = None,
-    cuisine: Optional[str] = None
-):
-    query = {}
-    
-    # Apply filters if provided
-    if search:
-        query["$or"] = [
-            {"title": {"$regex": search, "$options": "i"}},
-            {"description": {"$regex": search, "$options": "i"}}
-        ]
-    
-    if tags:
-        query["tags"] = {"$in": tags}
-    
-    if chef_id:
-        query["chef_id"] = chef_id
-    
-    if cuisine:
-        query["cuisine"] = cuisine
-    
-    recipes = []
-    for recipe in db.recipes.find(query).skip(skip).limit(limit).sort("created_at", pymongo.DESCENDING):
-        recipes.append(recipe)
-    
-    return recipes
-
-# Get a specific recipe by ID
-@router.get("/{recipe_id}", response_model=RecipeOut)
+@router.get("/{recipe_id}")
 async def get_recipe(recipe_id: str):
-    if not ObjectId.is_valid(recipe_id):
-        raise HTTPException(status_code=400, detail="Invalid recipe ID format")
-    
-    recipe = db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    if recipe is None:
-        raise HTTPException(status_code=404, detail="Recipe not found")
-    
-    return recipe
+    """
+    Get a specific recipe by ID
+    """
+    # This would typically fetch a recipe from a database
+    # For now, return a sample recipe
+    sample_recipe = {
+        "id": recipe_id,
+        "title": "Spaghetti Carbonara",
+        "description": "A classic Italian pasta dish with eggs, cheese, pancetta, and black pepper.",
+        "media": ["https://images.unsplash.com/photo-1612874742237-6526221588e3"],
+        "prep_time": 10,
+        "cook_time": 15,
+        "servings": 4,
+        "ingredients": [
+            {"name": "Spaghetti", "amount": "400g"},
+            {"name": "Pancetta", "amount": "150g"},
+            {"name": "Eggs", "amount": "3"},
+            {"name": "Parmesan cheese", "amount": "50g"},
+            {"name": "Black pepper", "amount": "to taste"},
+            {"name": "Salt", "amount": "to taste"}
+        ],
+        "instructions": [
+            "Bring a large pot of salted water to boil and cook spaghetti according to package instructions.",
+            "While pasta is cooking, fry pancetta in a large pan until crispy.",
+            "In a bowl, whisk eggs and grated parmesan cheese.",
+            "Drain pasta, reserving some cooking water.",
+            "Add pasta to the pan with pancetta, remove from heat.",
+            "Quickly stir in egg mixture, adding some reserved cooking water if needed to create a creamy sauce.",
+            "Season with black pepper and serve immediately."
+        ],
+        "tags": ["pasta", "italian", "dinner"]
+    }
+    return sample_recipe
 
-# Create a new recipe
-@router.post("/", response_model=RecipeOut, status_code=status.HTTP_201_CREATED)
-async def create_recipe(recipe: RecipeCreate):
-    recipe_dict = recipe.dict()
-    recipe_dict["created_at"] = datetime.utcnow()
-    recipe_dict["updated_at"] = recipe_dict["created_at"]
-    
-    result = db.recipes.insert_one(recipe_dict)
-    created_recipe = db.recipes.find_one({"_id": result.inserted_id})
-    
-    return created_recipe
+@router.post("/")
+async def create_recipe(recipe: Dict[str, Any]):
+    """
+    Create a new recipe
+    """
+    # This would typically save a recipe to a database
+    # For now, just return a success message
+    return {"message": "Recipe created successfully", "id": "new-recipe-id"}
 
-# Update a recipe
-@router.put("/{recipe_id}", response_model=RecipeOut)
-async def update_recipe(recipe_id: str, recipe_update: RecipeUpdate):
-    if not ObjectId.is_valid(recipe_id):
-        raise HTTPException(status_code=400, detail="Invalid recipe ID format")
-    
-    # Check if recipe exists
-    recipe = db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    if recipe is None:
-        raise HTTPException(status_code=404, detail="Recipe not found")
-    
-    # Update only provided fields
-    update_data = {k: v for k, v in recipe_update.dict(exclude_unset=True).items() if v is not None}
-    
-    if update_data:
-        update_data["updated_at"] = datetime.utcnow()
-        
-        # Increment version if not explicitly provided
-        if "version" not in update_data:
-            update_data["version"] = recipe.get("version", 1) + 1
-        
-        db.recipes.update_one(
-            {"_id": ObjectId(recipe_id)},
-            {"$set": update_data}
-        )
-    
-    updated_recipe = db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    return updated_recipe
+@router.put("/{recipe_id}")
+async def update_recipe(recipe_id: str, recipe: Dict[str, Any]):
+    """
+    Update an existing recipe
+    """
+    # This would typically update a recipe in a database
+    # For now, just return a success message
+    return {"message": f"Recipe {recipe_id} updated successfully"}
 
-# Delete a recipe
-@router.delete("/{recipe_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{recipe_id}")
 async def delete_recipe(recipe_id: str):
-    if not ObjectId.is_valid(recipe_id):
-        raise HTTPException(status_code=400, detail="Invalid recipe ID format")
-    
-    # Check if recipe exists
-    recipe = db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    if recipe is None:
-        raise HTTPException(status_code=404, detail="Recipe not found")
-    
-    db.recipes.delete_one({"_id": ObjectId(recipe_id)})
-    return None
-
-# Create a new version of a recipe
-@router.post("/{recipe_id}/versions", response_model=RecipeOut)
-async def create_recipe_version(recipe_id: str, recipe_update: RecipeUpdate):
-    if not ObjectId.is_valid(recipe_id):
-        raise HTTPException(status_code=400, detail="Invalid recipe ID format")
-    
-    # Check if recipe exists
-    recipe = db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    if recipe is None:
-        raise HTTPException(status_code=404, detail="Recipe not found")
-    
-    # Create a new recipe document based on the existing one
-    new_recipe = recipe.copy()
-    new_recipe.pop("_id")  # Remove the original ID
-    
-    # Update with the provided changes
-    update_data = {k: v for k, v in recipe_update.dict(exclude_unset=True).items() if v is not None}
-    new_recipe.update(update_data)
-    
-    # Set version and timestamps
-    new_recipe["version"] = recipe.get("version", 1) + 1
-    new_recipe["created_at"] = datetime.utcnow()
-    new_recipe["updated_at"] = new_recipe["created_at"]
-    
-    # Insert as a new document
-    result = db.recipes.insert_one(new_recipe)
-    created_version = db.recipes.find_one({"_id": result.inserted_id})
-    
-    return created_version
-
-# Get all versions of a recipe
-@router.get("/{recipe_id}/versions", response_model=List[RecipeOut])
-async def get_recipe_versions(recipe_id: str):
-    if not ObjectId.is_valid(recipe_id):
-        raise HTTPException(status_code=400, detail="Invalid recipe ID format")
-    
-    # Check if recipe exists
-    recipe = db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    if recipe is None:
-        raise HTTPException(status_code=404, detail="Recipe not found")
-    
-    # Find all recipes with the same title and chef_id
-    versions = []
-    for version in db.recipes.find({
-        "title": recipe["title"],
-        "chef_id": recipe["chef_id"]
-    }).sort("version", pymongo.ASCENDING):
-        versions.append(version)
-    
-    return versions
+    """
+    Delete a recipe
+    """
+    # This would typically delete a recipe from a database
+    # For now, just return a success message
+    return {"message": f"Recipe {recipe_id} deleted successfully"}

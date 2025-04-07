@@ -1,44 +1,8 @@
 {
-  "version": 2,
-  "name": "cookpilot-frontend",
-  "builds": [
+  "rewrites": [
     {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "build"
-      }
+      "source": "/api/(.*)",
+      "destination": "https://your-backend-url.onrender.com/api/$1"
     }
-  ],
-  "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/favicon.ico",
-      "dest": "/favicon.ico"
-    },
-    {
-      "src": "/manifest.json",
-      "dest": "/manifest.json"
-    },
-    {
-      "src": "/robots.txt",
-      "dest": "/robots.txt"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ],
-  "env": {
-    "REACT_APP_API_URL": "https://cookpilot-backend.onrender.com",
-    "REACT_APP_FIREBASE_API_KEY": "AIzaSyDQzB88GIZUmQs-a67eMDP9KvZX_Em_UVk",
-    "REACT_APP_FIREBASE_AUTH_DOMAIN": "cookpilot-121da.firebaseapp.com",
-    "REACT_APP_FIREBASE_PROJECT_ID": "cookpilot-121da",
-    "REACT_APP_FIREBASE_STORAGE_BUCKET": "cookpilot-121da.appspot.com",
-    "REACT_APP_FIREBASE_MESSAGING_SENDER_ID": "468372532798",
-    "REACT_APP_FIREBASE_APP_ID": "1:468372532798:web:3a9c5d4e7823f7b5a8c3e9"
-  }
+  ]
 }

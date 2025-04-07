@@ -1,8 +1,4 @@
-fastapi==0.95.0
-uvicorn==0.21.1
-pymongo==4.3.3
-python-dotenv==1.0.0
-pydantic==1.10.7
-firebase-admin==6.1.0
-PyJWT==2.6.0
-python-multipart==0.0.6
+fastapi
+uvicorn
+firebase-admin
+python-dotenv

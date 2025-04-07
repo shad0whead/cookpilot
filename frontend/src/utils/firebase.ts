@@ -1,4 +1,5 @@
 // src/utils/firebase.ts
+// Added comment to ensure file is tracked by Git for Vercel deployment
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 

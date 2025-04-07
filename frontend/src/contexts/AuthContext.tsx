@@ -8,7 +8,7 @@ import {
   sendPasswordResetEmail,
   sendEmailVerification
 } from 'firebase/auth';
-import { auth } from '../utils/firebase.ts';
+import { auth } from '../utils/firebase';
 
 interface AuthContextType {
   currentUser: User | null;

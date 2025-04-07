@@ -1,3 +1,4 @@
+// Dummy edit to force Vercel redeploy
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 

@@ -10,7 +10,8 @@ import {
 import { auth } from '../utils/firebase';
 
 interface AuthContextType {
-  user: User | null;
+  currentUser: User | null;
+  user: User | null; // Keep for backward compatibility
   login: (email: string, password: string) => Promise<any>;
   signup: (email: string, password: string) => Promise<any>;
   logout: () => Promise<void>;
@@ -39,7 +40,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout }}>
+    <AuthContext.Provider value={{ 
+      currentUser: user, // Add currentUser property
+      user, 
+      login, 
+      signup, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );

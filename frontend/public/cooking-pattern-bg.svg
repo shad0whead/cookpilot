@@ -1,0 +1,23 @@
+/* Cooking pattern background SVG */
+<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="cooking-pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+      <!-- Whisk -->
+      <path d="M80 20C78 18 74 18 72 20L65 27C63 29 63 33 65 35C67 37 71 37 73 35L80 28C82 26 82 22 80 20Z" fill="none" stroke="#D4A76A" stroke-width="0.5" opacity="0.3"/>
+      
+      <!-- Spoon -->
+      <path d="M30 70C28 68 28 64 30 62C32 60 36 60 38 62C40 64 40 68 38 70L35 73C33 75 29 75 27 73L24 70C22 68 22 64 24 62" fill="none" stroke="#D4A76A" stroke-width="0.5" opacity="0.3"/>
+      
+      <!-- Herb leaf -->
+      <path d="M15 15C17 13 20 12 23 13C25 14 26 17 25 20C24 23 21 25 18 24C16 23 15 20 16 17" fill="none" stroke="#6A8D73" stroke-width="0.5" opacity="0.3"/>
+      
+      <!-- Bowl -->
+      <ellipse cx="70" cy="70" rx="10" ry="5" fill="none" stroke="#D4A76A" stroke-width="0.5" opacity="0.3"/>
+      <path d="M60 70C60 65 65 60 70 60C75 60 80 65 80 70" fill="none" stroke="#D4A76A" stroke-width="0.5" opacity="0.3"/>
+      
+      <!-- Star/Seasoning -->
+      <path d="M40 40L42 35L44 40L49 42L44 44L42 49L40 44L35 42L40 40Z" fill="none" stroke="#D4A76A" stroke-width="0.5" opacity="0.3"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#cooking-pattern)"/>
+</svg>

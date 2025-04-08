@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from 'contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 
 interface LoginProps {
@@ -12,7 +12,7 @@ const Login: React.FC<LoginProps> = ({ onToggleForm }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [verificationNeeded, setVerificationNeeded] = useState(false);
-  const { login, user: currentUser, logout: sendVerificationEmail, logout: isEmailVerified } = useAuth();
+  const { login, currentUser, logout } = useAuth();
   const navigate = useNavigate();
 
   // Check if user is already logged in and verified
@@ -44,8 +44,8 @@ const Login: React.FC<LoginProps> = ({ onToggleForm }) => {
     try {
       setError('');
       setLoading(true);
-      // Simplified to just use logout as a placeholder since we don't have sendVerificationEmail
-      await sendVerificationEmail();
+      // Simplified to just use logout as a placeholder
+      await logout();
       setError(''); // Clear any previous errors
       // Show success message
       alert('Verification email sent! Please check your inbox and verify your email address before logging in.');
@@ -135,8 +135,8 @@ const Login: React.FC<LoginProps> = ({ onToggleForm }) => {
                 Email
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-center">
+                  <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"></path>
                     <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"></path>
                   </svg>
@@ -157,8 +157,8 @@ const Login: React.FC<LoginProps> = ({ onToggleForm }) => {
                 Password
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-center">
+                  <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"></path>
                   </svg>
                 </div>

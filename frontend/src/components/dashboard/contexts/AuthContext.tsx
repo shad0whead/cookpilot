@@ -8,7 +8,7 @@ import {
   sendPasswordResetEmail
 } from 'firebase/auth';
 // @ts-ignore
-import { auth } from '../../../../utils/firebase';
+import { auth } from '../../../utils/firebase';
 interface AuthContextType {
   currentUser: User | null;
   loading: boolean;

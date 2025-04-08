@@ -59,7 +59,7 @@ const Login: React.FC<LoginProps> = ({ onToggleForm }) => {
 
   if (verificationNeeded) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900 bg-[url('/cooking-pattern-bg.svg')] bg-opacity-90">
+      <div className="flex items-center justify-center min-h-screen bg-gray-900 bg-opacity-90">
         <div className="w-full max-w-md p-8 bg-gray-800 rounded-lg shadow-xl border border-amber-700/30 text-gray-100 relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 -mt-10 -mr-10 bg-amber-500/10 rounded-full"></div>
           <div className="absolute bottom-0 left-0 w-24 h-24 -mb-8 -ml-8 bg-amber-500/10 rounded-full"></div>
@@ -98,7 +98,7 @@ const Login: React.FC<LoginProps> = ({ onToggleForm }) => {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-900 bg-[url('/cooking-pattern-bg.svg')] bg-opacity-90">
+    <div className="flex items-center justify-center min-h-screen bg-gray-900 bg-opacity-90">
       <div className="relative w-full max-w-md">
         {/* Decorative elements */}
         <div className="absolute -top-16 -left-16 w-32 h-32 bg-amber-500/20 rounded-full blur-md"></div>

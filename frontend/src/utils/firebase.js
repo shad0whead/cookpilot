@@ -1,10 +1,22 @@
-// This is a DEV_MODE-only version of firebase.js that doesn't require actual Firebase credentials
+// This is an enhanced DEV_MODE-only version of firebase.js that includes the settings property
 // It provides mock implementations of Firebase auth functions for development purposes
 
 // Mock auth object with methods that simulate Firebase auth behavior
 const auth = {
   // Current user state (null when not logged in)
   currentUser: null,
+  
+  // Add settings property to prevent "Cannot read properties of undefined (reading 'settings')" error
+  settings: {
+    appVerificationDisabledForTesting: true,
+    passwordPolicy: {
+      minimumLength: 6,
+      requireUppercase: false,
+      requireLowercase: false,
+      requireNumeric: false,
+      requireNonAlphanumeric: false
+    }
+  },
   
   // Mock sign in function
   signInWithEmailAndPassword: (email, password) => {

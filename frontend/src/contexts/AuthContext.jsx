@@ -1,26 +1,16 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut as firebaseSignOut,
-  sendPasswordResetEmail,
-  updateProfile as firebaseUpdateProfile,
-  User
-} from 'firebase/auth';
-import { auth } from '../utils/firebase';
 
 // Create Auth Context
-const AuthContext = createContext(null);
-
-// DEV_MODE flag - set to true for development, false for production
-const DEV_MODE = true;
+const AuthContext = createContext();
 
 // Auth Provider Component with DEV_MODE support
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // DEV_MODE flag - set to true for development, false for production
+  const DEV_MODE = true;
   
   // Mock user for development
   const mockUser = {
@@ -40,88 +30,63 @@ export const AuthProvider = ({ children }) => {
       return;
     }
     
-    // Normal Firebase authentication listener
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
+    // Normal authentication logic would go here
+    // This would typically include Firebase auth listeners
+    // For now, we'll just set loading to false after a delay to simulate auth check
+    const timeout = setTimeout(() => {
       setLoading(false);
-    });
+    }, 1000);
     
-    return unsubscribe;
+    return () => clearTimeout(timeout);
   }, []);
   
   // Sign in function
-  const login = async (email, password) => {
+  const signIn = async (email, password) => {
     try {
       setLoading(true);
-      setError(null);
       
       // In DEV_MODE, just use the mock user
       if (DEV_MODE) {
-        console.log('DEV_MODE enabled: Using mock login');
         setCurrentUser(mockUser);
         setLoading(false);
-        return { user: mockUser };
+        return;
       }
       
-      // Normal Firebase sign in
-      const result = await signInWithEmailAndPassword(auth, email, password);
-      return result;
-    } catch (err) {
-      console.error('Login error:', err);
-      setError(err.message);
-      throw err;
-    } finally {
+      // Normal sign in logic would go here
+      // For now, we'll just simulate a successful login
+      setCurrentUser({
+        uid: 'user-123',
+        email: email,
+        displayName: 'User',
+        photoURL: null,
+        emailVerified: true
+      });
+      
       setLoading(false);
-    }
-  };
-  
-  // Sign up function
-  const signup = async (email, password) => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      // In DEV_MODE, just use the mock user
-      if (DEV_MODE) {
-        console.log('DEV_MODE enabled: Using mock signup');
-        setCurrentUser(mockUser);
-        setLoading(false);
-        return { user: mockUser };
-      }
-      
-      // Normal Firebase sign up
-      const result = await createUserWithEmailAndPassword(auth, email, password);
-      return result;
     } catch (err) {
-      console.error('Signup error:', err);
-      setError(err.message);
-      throw err;
-    } finally {
+      setError('Failed to sign in: ' + err.message);
       setLoading(false);
     }
   };
   
   // Sign out function
-  const logout = async () => {
+  const signOut = async () => {
     try {
       setLoading(true);
-      setError(null);
       
       // In DEV_MODE, just clear the current user
       if (DEV_MODE) {
-        console.log('DEV_MODE enabled: Using mock logout');
         setCurrentUser(null);
         setLoading(false);
         return;
       }
       
-      // Normal Firebase sign out
-      await firebaseSignOut(auth);
+      // Normal sign out logic would go here
+      setCurrentUser(null);
+      
+      setLoading(false);
     } catch (err) {
-      console.error('Logout error:', err);
-      setError(err.message);
-      throw err;
-    } finally {
+      setError('Failed to sign out: ' + err.message);
       setLoading(false);
     }
   };
@@ -130,22 +95,18 @@ export const AuthProvider = ({ children }) => {
   const resetPassword = async (email) => {
     try {
       setLoading(true);
-      setError(null);
       
       // In DEV_MODE, just simulate success
       if (DEV_MODE) {
-        console.log('DEV_MODE enabled: Simulating password reset');
         setLoading(false);
         return;
       }
       
-      // Normal Firebase reset password
-      await sendPasswordResetEmail(auth, email);
+      // Normal reset password logic would go here
+      
+      setLoading(false);
     } catch (err) {
-      console.error('Reset password error:', err);
-      setError(err.message);
-      throw err;
-    } finally {
+      setError('Failed to reset password: ' + err.message);
       setLoading(false);
     }
   };
@@ -154,11 +115,9 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (displayName, photoURL) => {
     try {
       setLoading(true);
-      setError(null);
       
       // In DEV_MODE, just update the mock user
       if (DEV_MODE) {
-        console.log('DEV_MODE enabled: Updating mock user profile');
         setCurrentUser({
           ...mockUser,
           displayName: displayName || mockUser.displayName,
@@ -168,25 +127,11 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       
-      // Normal Firebase update profile
-      if (currentUser) {
-        await firebaseUpdateProfile(currentUser, {
-          displayName: displayName || currentUser.displayName,
-          photoURL: photoURL || currentUser.photoURL
-        });
-        
-        // Update the current user state to reflect changes
-        setCurrentUser({
-          ...currentUser,
-          displayName: displayName || currentUser.displayName,
-          photoURL: photoURL || currentUser.photoURL
-        });
-      }
+      // Normal update profile logic would go here
+      
+      setLoading(false);
     } catch (err) {
-      console.error('Update profile error:', err);
-      setError(err.message);
-      throw err;
-    } finally {
+      setError('Failed to update profile: ' + err.message);
       setLoading(false);
     }
   };
@@ -195,9 +140,8 @@ export const AuthProvider = ({ children }) => {
     currentUser,
     loading,
     error,
-    login,
-    signup,
-    logout,
+    signIn,
+    signOut,
     resetPassword,
     updateProfile,
     DEV_MODE
@@ -208,9 +152,7 @@ export const AuthProvider = ({ children }) => {
 
 // Custom hook to use Auth Context
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within an AuthProvider');
-  return context;
+  return useContext(AuthContext);
 };
 
 export default AuthContext;

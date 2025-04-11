@@ -1,158 +1,139 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { auth } from '../utils/firebase';
 
-// Create Auth Context
+// Set to true to bypass Firebase authentication for development
+const DEV_MODE = true;
+
+// Create the authentication context
 const AuthContext = createContext();
 
-// Auth Provider Component with DEV_MODE support
-export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
+// Custom hook to use the auth context
+export function useAuth() {
+  return useContext(AuthContext);
+}
+
+// Provider component that wraps the app and provides auth context
+export function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  
-  // DEV_MODE flag - set to true for development, false for production
-  const DEV_MODE = true;
-  
-  // Mock user for development
-  const mockUser = {
-    uid: 'dev-user-123',
-    email: 'dev@example.com',
-    displayName: 'Development User',
-    photoURL: null,
-    emailVerified: true
+  const [error, setError] = useState('');
+
+  // Function to handle login
+  const login = async (email, password) => {
+    setError('');
+    try {
+      if (DEV_MODE) {
+        console.log('DEV_MODE: Logging in with mock credentials');
+        // In DEV_MODE, we'll use the mock auth implementation
+        const result = await auth.signInWithEmailAndPassword(email, password);
+        setUser(result.user);
+        return result;
+      } else {
+        // In production, we'll use the real Firebase auth
+        const result = await auth.signInWithEmailAndPassword(email, password);
+        setUser(result.user);
+        return result;
+      }
+    } catch (err) {
+      console.error('Login error:', err.message);
+      setError(err.message);
+      throw err;
+    }
   };
-  
+
+  // Function to handle signup
+  const signup = async (email, password) => {
+    setError('');
+    try {
+      if (DEV_MODE) {
+        console.log('DEV_MODE: Signing up with mock credentials');
+        // In DEV_MODE, we'll use the mock auth implementation
+        const result = await auth.createUserWithEmailAndPassword(email, password);
+        setUser(result.user);
+        return result;
+      } else {
+        // In production, we'll use the real Firebase auth
+        const result = await auth.createUserWithEmailAndPassword(email, password);
+        setUser(result.user);
+        return result;
+      }
+    } catch (err) {
+      console.error('Signup error:', err.message);
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  // Function to handle logout
+  const logout = async () => {
+    setError('');
+    try {
+      if (DEV_MODE) {
+        console.log('DEV_MODE: Logging out');
+        // In DEV_MODE, we'll use the mock auth implementation
+        await auth.signOut();
+        setUser(null);
+      } else {
+        // In production, we'll use the real Firebase auth
+        await auth.signOut();
+        setUser(null);
+      }
+    } catch (err) {
+      console.error('Logout error:', err.message);
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  // Effect to handle auth state changes
   useEffect(() => {
-    // If DEV_MODE is enabled, auto-login with mock user
+    console.log('DEV_MODE enabled:', DEV_MODE);
+    
     if (DEV_MODE) {
-      console.log('DEV_MODE enabled: Auto-logging in with mock user');
-      setCurrentUser(mockUser);
+      // In DEV_MODE, we'll auto-login a mock user
+      console.log('DEV_MODE: Auto-logging in mock user');
+      const mockUser = {
+        uid: 'dev-user-123',
+        email: 'dev@example.com',
+        displayName: 'Development User',
+        emailVerified: true
+      };
+      setUser(mockUser);
       setLoading(false);
-      return;
+      return () => {}; // Return empty cleanup function
     }
     
-    // Normal authentication logic would go here
-    // This would typically include Firebase auth listeners
-    // For now, we'll just set loading to false after a delay to simulate auth check
-    const timeout = setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-    
-    return () => clearTimeout(timeout);
-  }, []);
-  
-  // Sign in function
-  const signIn = async (email, password) => {
+    // In production, we'll listen for auth state changes
     try {
-      setLoading(true);
-      
-      // In DEV_MODE, just use the mock user
-      if (DEV_MODE) {
-        setCurrentUser(mockUser);
+      const unsubscribe = auth.onAuthStateChanged(user => {
+        setUser(user);
         setLoading(false);
-        return;
-      }
-      
-      // Normal sign in logic would go here
-      // For now, we'll just simulate a successful login
-      setCurrentUser({
-        uid: 'user-123',
-        email: email,
-        displayName: 'User',
-        photoURL: null,
-        emailVerified: true
       });
       
-      setLoading(false);
+      // Cleanup subscription
+      return unsubscribe;
     } catch (err) {
-      setError('Failed to sign in: ' + err.message);
+      console.error('Auth state change error:', err.message);
       setLoading(false);
+      return () => {}; // Return empty cleanup function
     }
-  };
-  
-  // Sign out function
-  const signOut = async () => {
-    try {
-      setLoading(true);
-      
-      // In DEV_MODE, just clear the current user
-      if (DEV_MODE) {
-        setCurrentUser(null);
-        setLoading(false);
-        return;
-      }
-      
-      // Normal sign out logic would go here
-      setCurrentUser(null);
-      
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to sign out: ' + err.message);
-      setLoading(false);
-    }
-  };
-  
-  // Reset password function
-  const resetPassword = async (email) => {
-    try {
-      setLoading(true);
-      
-      // In DEV_MODE, just simulate success
-      if (DEV_MODE) {
-        setLoading(false);
-        return;
-      }
-      
-      // Normal reset password logic would go here
-      
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to reset password: ' + err.message);
-      setLoading(false);
-    }
-  };
-  
-  // Update profile function
-  const updateProfile = async (displayName, photoURL) => {
-    try {
-      setLoading(true);
-      
-      // In DEV_MODE, just update the mock user
-      if (DEV_MODE) {
-        setCurrentUser({
-          ...mockUser,
-          displayName: displayName || mockUser.displayName,
-          photoURL: photoURL || mockUser.photoURL
-        });
-        setLoading(false);
-        return;
-      }
-      
-      // Normal update profile logic would go here
-      
-      setLoading(false);
-    } catch (err) {
-      setError('Failed to update profile: ' + err.message);
-      setLoading(false);
-    }
-  };
-  
+  }, []);
+
+  // Value to be provided by the context
   const value = {
-    currentUser,
-    loading,
+    user,
+    currentUser: user, // Add currentUser property for compatibility
+    login,
+    signup,
+    logout,
     error,
-    signIn,
-    signOut,
-    resetPassword,
-    updateProfile,
+    loading,
     DEV_MODE
   };
-  
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
 
-// Custom hook to use Auth Context
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
-
-export default AuthContext;
+  return (
+    <AuthContext.Provider value={value}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
+}
